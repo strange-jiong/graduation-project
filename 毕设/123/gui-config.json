@@ -1,0 +1,27 @@
+{
+"configs" : [
+  {
+"server" : "sa7.uudaili.info",
+"server_port" : 17066,
+"password" : "zhouyi407zhouyi407",
+"method" : "aes-256-cfb",
+"remarks" : ""}
+,
+  {
+"server" : "sa5.uudaili.info",
+"server_port" : 17066,
+"password" : "zhouyi407zhouyi407",
+"method" : "aes-256-cfb",
+"remarks" : ""}
+
+],
+"strategy" : null,
+"index" : 0,
+"global" : false,
+"enabled" : true,
+"shareOverLan" : false,
+"isDefault" : false,
+"localPort" : 65500,
+"pacUrl" : null,
+"useOnlinePac" : false,
+"availabilityStatistics" : true}
