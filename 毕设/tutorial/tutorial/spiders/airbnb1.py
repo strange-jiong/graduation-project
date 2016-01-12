@@ -18,14 +18,17 @@ import re
 
 class AirbnbSpider(scrapy.Spider):
 
-    """docstring for ClassName"""
+    """a spider for www.airbnb.com
+                                ——jiong
+    """
     name = 'airbnb1'
     allowed_domains = ['airbnb.com']
+
     # 测试用url
-    start_urls = [#'https://zh.airbnb.com/rooms/905492?s=LJkKsDuT',
-    				#'https://zh.airbnb.com/rooms/7327646?s=fy811GFZ',
-    				'https://zh.airbnb.com/rooms/5012640?s=bUQrtusy'
-    			  ]
+    start_urls = [  # 'https://zh.airbnb.com/rooms/905492?s=LJkKsDuT',
+        #'https://zh.airbnb.com/rooms/7327646?s=fy811GFZ',
+        'https://zh.airbnb.com/rooms/5012640?s=bUQrtusy'
+    ]
     # start_urls = [
     #     'https://zh.airbnb.com/s/London--United-Kingdom?source=ds',
     #     'https://zh.airbnb.com/s/Los-Angeles--CA?source=ds',
@@ -33,10 +36,22 @@ class AirbnbSpider(scrapy.Spider):
     #     'https://zh.airbnb.com/s/Boston--MA']
 
     def parse2(self, response):
-        # 这个extract() 不知道是干嘛用的，试了很久 可能是吧选择器进行转化用的。
-        # 必须得从某个城市的页面中获取具体房间url送入队列，之后再爬取这个url的内容，因为在这个url页面中仍然存在大量的相同的url，所以必须进行去重的操作
-        # 不要按照 chrome生成的xpath 路径 直接进行选取 很多情况下是不行的。
-
+        """抓取的信息包括room_name、
+                        room_id
+                        price、
+                        address、
+                        description、
+                        reviews_count、
+                        accuracy_score、
+                        location_score、
+                        communication_score、
+                        check_in_score、
+                        cleanliness_score、
+                        cost_performance_score
+        """
+        # 这个extract() 不知道是干嘛用的， 可能是从选择器对象中进行抽取。
+        # 必须得从某个城市的页面中获取具体房间url送入队列，之后再爬取这个url的内容，因为在这个url页面中仍然存在大量的相同的url，所以必须进行去重的操作。
+        # 不要按照chrome生成的xpath路径直接进行选取，很多情况下是不行的。
 
         # 查找本页面的租房信息
         for sel in response.xpath('//div[@itemprop="description"]/span/a'):
@@ -53,9 +68,8 @@ class AirbnbSpider(scrapy.Spider):
                 url = 'https://zh.airbnb.com' + sel.xpath('@href').extract()[0]
                 yield Request(url, callback=self.parse)
 
-
     def parse(self, response):
-        valid_urls=[]
+        valid_urls = []
         items = []
         # 将房屋主人的信息单独拿出来，送入parse3()函数中
         host = response.xpath(
@@ -82,7 +96,7 @@ class AirbnbSpider(scrapy.Spider):
         if not item['price']:
             item['price'] = ''.join(response.xpath(
                 '//div[@class="book-it__price-amount pull-left h3 text-special"]/span/text()').extract()).strip()
-            # print 'jion!!!!!!!!!!!!!!!!!!!!!!!!!!'
+            # print 'jiong!!!!!!!!!!!!!!!!!!!!!!!!!!'
         else:
             pass
 
@@ -100,7 +114,6 @@ class AirbnbSpider(scrapy.Spider):
         else:
             item['address'] = ''
 
-        # 如果评论的某个字段为空就舍弃
         # description中可能存在'\r'这样的空行，无效的空行，直接屏蔽掉
         item['description'] = []
         #/html/body/main/div[3]/div[3]/div/div[1]/div/div/div/div/div[7]/div[2]/div/div[2]/div/div[1]
@@ -113,7 +126,7 @@ class AirbnbSpider(scrapy.Spider):
                     pass
             else:
                 pass
-        if not len(item['description']) :
+        if not len(item['description']):
             for sel in response.xpath('//div[@class="expandable-content expandable-content-long"]/div'):
                 if sel.xpath('p/span/text()').extract():
                     temp = sel.xpath('p/span/text()').extract()[0].strip()
@@ -173,7 +186,7 @@ class AirbnbSpider(scrapy.Spider):
 
         # print item['reviews_count'][0]
         # 计算星星元素有几个，判断最后一个是否为半星，计算分值
-        # 星星这个实在是厉害，空白星星也是一个元素，但是却不在我所计算的list长度里，他有两批星星，其中带颜色的是覆盖在灰色星星之上的
+        # 星星这个实在是厉害，空白星星也是一个元素，但是却不在我所计算的list长度里，它有两批星星，其中带颜色的是覆盖在灰色星星之上的
         count = []
         count = response.xpath(
             '//*[@id="reviews"]/div/div/div/div/div/div[2]/div[1]/div[1]/div[2]/div/div[1]/div[1]/div/div/div/div[1]/span/i')
@@ -241,12 +254,15 @@ class AirbnbSpider(scrapy.Spider):
         else:
             pass
 
-        # 评论这边是最大的问题，它是通过js脚本生成的，因此我们在scrapy抓取过程中就需要通过一个中间件来执行这个js代码,
+        # 评论这边是最大的问题，它是通过js脚本生成的，因此我们在scrapy抓取过程中就需要通过一个中间件来执行这个js代码
 
         # 将得到的reponse送入浏览器引擎中
         # driver = self.browser.get(response.url)
         # 加载浏览器
         # time.sleep(5)
+
+        # 当然后来利用浏览器引擎进行解析的想法被我抛弃了，速度上实在实在是感人
+
         # 评价的部分,进行循环
         # item['comment_info'] = []
         # for sel in response.xpath('//*[@id="reviews"]/div/div/div/div/div/div[2]/div[2]/div/div[1]/div'):
@@ -260,7 +276,7 @@ class AirbnbSpider(scrapy.Spider):
 
         # 上述收集评价信息的这段代码注释掉了，并不能用，原因上面说了，因为是执行js脚本之后得到的信息，所以并不能用Xpath直接得到。
 
-        # 后来在parse4中实现了，直接获取它进行通信得到其余评价信息的url，得到的是传递信息用的json数据，对它进行解析。
+        # 我后来在parse4中实现了，直接获取它进行通信得到其余评价信息的url，得到的是传递信息用的json数据，对它进行解析。
 
         # 将空信息滤掉,如果存在该房间记录，就将住所记录到的部分为空的信息(比如说评价之类的，部分房间是没有的)，进行改进
         if item['room_name']:
@@ -282,6 +298,7 @@ class AirbnbSpider(scrapy.Spider):
 
     # 爬取房间主人拥有房间的信息
     def parse3(self, response):
+        # 示例网址
         # https://zh.airbnb.com/users/show/3434101
         # https://zh.airbnb.com/s?host_id=3434101
 
@@ -303,8 +320,9 @@ class AirbnbSpider(scrapy.Spider):
 
     # 爬取房间的评论信息
     def parse4(self, response):
-
+        # 示例网址
         # https://zh.airbnb.com/api/v2/reviews?key=d306zoyjsyarp7ifhu67rjxn52tv0t20&currency=CNY&locale=zh&listing_id=828294&role=guest&_format=for_p3&_limit=7&_offset=7&_order=language
+
         item = reviews()
         a = json.loads(response.body)
         # item['room_id'] = re.findall(r'listing_id=(.*)?&role', response.url)[0]
