@@ -3,6 +3,7 @@
 所用框架为python+scrapy，前期使用的测试平台为[这个](https://dash.scrapinghub.com/)(需要注册)，之后打算在本地跑，存入MySQL数据库中，方便进行数据分析。
 ###关于middlewares（中间件）的使用
 ###pipelines.py的定义
+mysql数据库实现异步存储
 ##使用
 以后再说。
 
