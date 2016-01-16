@@ -25,17 +25,17 @@ class AirbnbSpider(scrapy.Spider):
     allowed_domains = ['airbnb.com']
 
     # 测试用url
-    start_urls = [  # 'https://zh.airbnb.com/rooms/905492?s=LJkKsDuT',
-        #'https://zh.airbnb.com/rooms/7327646?s=fy811GFZ',
-        'https://zh.airbnb.com/rooms/5012640?s=bUQrtusy'
-    ]
-    # start_urls = [
-    #     'https://zh.airbnb.com/s/London--United-Kingdom?source=ds',
-    #     'https://zh.airbnb.com/s/Los-Angeles--CA?source=ds',
-    #     'https://zh.airbnb.com/s/Tokyo--Japan?source=ds',
-    #     'https://zh.airbnb.com/s/Boston--MA']
+    # start_urls = [  # 'https://zh.airbnb.com/rooms/905492?s=LJkKsDuT',
+    #     #'https://zh.airbnb.com/rooms/7327646?s=fy811GFZ',
+    #     # 'https://zh.airbnb.com/rooms/5012640?s=bUQrtusy'
+    # ]
+    start_urls = [
+        'https://zh.airbnb.com/s/London--United-Kingdom?source=ds',
+        'https://zh.airbnb.com/s/Los-Angeles--CA?source=ds',
+        'https://zh.airbnb.com/s/Tokyo--Japan?source=ds',
+        'https://zh.airbnb.com/s/Boston--MA']
 
-    def parse2(self, response):
+    def parse(self, response):
         """抓取的信息包括room_name、
                         room_id
                         price、
@@ -55,8 +55,7 @@ class AirbnbSpider(scrapy.Spider):
 
         # 查找本页面的租房信息
         for sel in response.xpath('//div[@itemprop="description"]/span/a'):
-            # print
-            # len(response.xpath('//div[@itemprop="description"]/span/a'))
+            # print len(response.xpath('//div[@itemprop="description"]/span/a'))
             url = 'https://zh.airbnb.com' + sel.xpath('@href').extract()[0]
             yield Request(url, callback=self.parse2)
 
@@ -68,7 +67,7 @@ class AirbnbSpider(scrapy.Spider):
                 url = 'https://zh.airbnb.com' + sel.xpath('@href').extract()[0]
                 yield Request(url, callback=self.parse)
 
-    def parse(self, response):
+    def parse2(self, response):
         valid_urls = []
         items = []
         # 将房屋主人的信息单独拿出来，送入parse3()函数中

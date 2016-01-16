@@ -103,7 +103,7 @@ DOWNLOADER_MIDDLEWARES = {
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
    # 'tutorial.pipelines.MySQLStoreCnblogsPipeline': 300,
-   # 'tutorial.pipelines.TutorialPipeline':300,
+   'tutorial.pipelines.TutorialPipeline':300,
    # 'tutorial.pipelines.SQLStorePipeline':300
 }
 # ITEM_PIPELINES = []
