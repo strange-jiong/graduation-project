@@ -7,7 +7,7 @@
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
-
+import os
 import MySQLdb
 """
 CREATE DATABASE cnblogsdb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;

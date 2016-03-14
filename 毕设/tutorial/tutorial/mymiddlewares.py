@@ -9,92 +9,39 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 from scrapy.exceptions import IgnoreRequest
-from scrapy.contrib.downloadermiddleware import DownloaderMiddleware
 import random
 import base64
-# from settings import PROXIES
+from settings import PROXIES
 
 
-# class RandomUserAgent(object):
-#     """Randomly rotate user agents based on a list of predefined ones"""
 
-#     def __init__(self, agents):
-#         self.agents = agents
+class ProxyMiddleware(object):
 
-#     @classmethod
-#     def from_crawler(cls, crawler):
-#         return cls(crawler.settings.getlist('USER_AGENTS'))
-
-#     def process_request(self, request, spider):
-#         # print "**************************" + random.choice(self.agents)
-#         # request.headers.setdefault('User-Agent', random.choice(self.agents))
-
-
-# class ProxyMiddleware(object):
-
-#     def process_request(self, request, spider):
-#         proxy = random.choice(PROXIES)
-#         if proxy['user_pass'] is not None:
-#             request.meta['proxy'] = "http://%s" % proxy['ip_port']
-#             encoded_user_pass = base64.encodestring(proxy['user_pass'])
-#             request.headers[
-#                 'Proxy-Authorization'] = 'Basic ' + encoded_user_pass
-#             print "**************ProxyMiddleware have pass************" + proxy['ip_port']
-#         else:
-#             print "**************ProxyMiddleware no pass************" + proxy['ip_port']
-#             request.meta['proxy'] = "http://%s" % proxy['ip_port']
+    def process_request(self, request, spider):
+        proxy = random.choice(PROXIES)
+        if proxy['user_pass'] is not None:
+            request.meta['proxy'] = "http://%s" % proxy['ip_port']
+            encoded_user_pass = base64.encodestring(proxy['user_pass'])
+            request.headers[
+                'Proxy-Authorization'] = 'Basic ' + encoded_user_pass
+            print "**************ProxyMiddleware have pass************" + proxy['ip_port']
+        else:
+            print "**************ProxyMiddleware no pass************" + proxy['ip_port']
+            request.meta['proxy'] = "http://%s" % proxy['ip_port']
 
 
-"""ÈÅøÂÖçË¢´banÁ≠ñÁï•‰πã‰∏ÄÔºö‰ΩøÁî®useragentÊ±†„ÄÇ
+"""±‹√‚±ªban≤ﬂ¬‘÷Æ“ª£∫ π”√useragent≥ÿ°£
 
-‰ΩøÁî®Ê≥®ÊÑèÔºöÈúÄÂú®settings.py‰∏≠ËøõË°åÁõ∏Â∫îÁöÑËÆæÁΩÆ„ÄÇ
+ π”√◊¢“‚£∫–Ë‘⁄settings.py÷–Ω¯––œ‡”¶µƒ…Ë÷√°£
 """
-# from scrapy import log
-# import random
-from scrapy.downloadermiddleware.useragent import UserAgentMiddleware
+
+# from scrapy.downloadermiddleware.useragent import UserAgentMiddleware
 
 
-class RotateUserAgentMiddleware(UserAgentMiddleware):
+class RotateUserAgentMiddleware(object):
 
-	# user_agent_list = [
-	# 	"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 "
-	# 	"(KHTML, like Gecko) Chrome/22.0.1207.1 Safari/537.1",
-	# 	"Mozilla/5.0 (X11; CrOS i686 2268.111.0) AppleWebKit/536.11 "
-	# 	"(KHTML, like Gecko) Chrome/20.0.1132.57 Safari/536.11",
-	# 	"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.6 "
-	# 	"(KHTML, like Gecko) Chrome/20.0.1092.0 Safari/536.6",
-	# 	"Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.6 "
-	# 	"(KHTML, like Gecko) Chrome/20.0.1090.0 Safari/536.6",
-	# 	"Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.1 "
-	# 	"(KHTML, like Gecko) Chrome/19.77.34.5 Safari/537.1",
-	# 	"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/536.5 "
-	# 	"(KHTML, like Gecko) Chrome/19.0.1084.9 Safari/536.5",
-	# 	"Mozilla/5.0 (Windows NT 6.0) AppleWebKit/536.5 "
-	# 	"(KHTML, like Gecko) Chrome/19.0.1084.36 Safari/536.5",
-	# 	"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.3 "
-	# 	"(KHTML, like Gecko) Chrome/19.0.1063.0 Safari/536.3",
-	# 	"Mozilla/5.0 (Windows NT 5.1) AppleWebKit/536.3 "
-	# 	"(KHTML, like Gecko) Chrome/19.0.1063.0 Safari/536.3",
-	# 	"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_0) AppleWebKit/536.3 "
-	# 	"(KHTML, like Gecko) Chrome/19.0.1063.0 Safari/536.3",
-	# 	"Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.3 "
-	# 	"(KHTML, like Gecko) Chrome/19.0.1062.0 Safari/536.3",
-	# 	"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.3 "
-	# 	"(KHTML, like Gecko) Chrome/19.0.1062.0 Safari/536.3",
-	# 	"Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.3 "
-	# 	"(KHTML, like Gecko) Chrome/19.0.1061.1 Safari/536.3",
-	# 	"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.3 "
-	# 	"(KHTML, like Gecko) Chrome/19.0.1061.1 Safari/536.3",
-	# 	"Mozilla/5.0 (Windows NT 6.1) AppleWebKit/536.3 "
-	# 	"(KHTML, like Gecko) Chrome/19.0.1061.1 Safari/536.3",
-	# 	"Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.3 "
-	# 	"(KHTML, like Gecko) Chrome/19.0.1061.0 Safari/536.3",
-	# 	"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.24 "
-	# 	"(KHTML, like Gecko) Chrome/19.0.1055.1 Safari/535.24",
-	# 	"Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/535.24 "
-	# 	"(KHTML, like Gecko) Chrome/19.0.1055.1 Safari/535.24"
-	# ]
-	user_agent_list = [
+	def __init__(self, user_agent=''):
+		self.user_agent = [
 	    "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; AcooBrowser; .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
 	    "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; Acoo Browser; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)",
 	    "Mozilla/4.0 (compatible; MSIE 7.0; AOL 9.5; AOLBuild 4337.35; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
@@ -113,18 +60,12 @@ class RotateUserAgentMiddleware(UserAgentMiddleware):
 	    "Opera/9.80 (Macintosh; Intel Mac OS X 10.6.8; U; fr) Presto/2.9.168 Version/11.52",
 	]
 
-	def __init__(self, user_agent=''):
-		self.user_agent = user_agent
-
 	def process_request(self, request, spider):
-		ua = random.choice(self.user_agent_list)
+		ua = random.choice(self.user_agent)
 		print ua
-		# if ua:
-		#     # ÊòæÁ§∫ÂΩìÂâç‰ΩøÁî®ÁöÑuseragent
-		#     print "********Current UserAgent:%s************" % ua
-
-		#     # ËÆ∞ÂΩï
-		#     # log.msg('Current UserAgent: ' + ua, level='INFO')
+		if ua:
+		    # œ‘ æµ±«∞ π”√µƒuseragent
+		    print "********Current UserAgent:%s************" % ua
 		request.headers.setdefault('User-Agent', ua)
 
 	# the default user_agent_list composes chrome,I E,firefox,Mozilla,opera,netscape

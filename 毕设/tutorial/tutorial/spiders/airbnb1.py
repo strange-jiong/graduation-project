@@ -11,14 +11,14 @@ import scrapy
 from scrapy.http import Request
 from tutorial.items import AirbnbItem, info, reviews
 import time
-# from selenium import webdriver
 import json
 import re
 
 
 class AirbnbSpider(scrapy.Spider):
 
-    """a spider for www.airbnb.com
+    """
+    a spider for www.airbnb.com
                                 ——jiong
     """
     name = 'airbnb1'
@@ -29,25 +29,18 @@ class AirbnbSpider(scrapy.Spider):
     #     #'https://zh.airbnb.com/rooms/7327646?s=fy811GFZ',
     #     # 'https://zh.airbnb.com/rooms/5012640?s=bUQrtusy'
     # ]
-    start_urls = [
-        'https://zh.airbnb.com/s/London--United-Kingdom?source=ds',
-        'https://zh.airbnb.com/s/Los-Angeles--CA?source=ds',
-        'https://zh.airbnb.com/s/Tokyo--Japan?source=ds',
-        'https://zh.airbnb.com/s/Boston--MA']
+
+    # 也是测试用url
+    start_urls = ['https://zh.airbnb.com/s/New-York--NY?source=ds&s_tag=Pswu6mlb']
+    # start_urls = [
+    #     'https://zh.airbnb.com/s/London--United-Kingdom?source=ds',
+    #     'https://zh.airbnb.com/s/Los-Angeles--CA?source=ds',
+    #     'https://zh.airbnb.com/s/Tokyo--Japan?source=ds',
+    #     'https://zh.airbnb.com/s/Boston--MA']
 
     def parse(self, response):
-        """抓取的信息包括room_name、
-                        room_id
-                        price、
-                        address、
-                        description、
-                        reviews_count、
-                        accuracy_score、
-                        location_score、
-                        communication_score、
-                        check_in_score、
-                        cleanliness_score、
-                        cost_performance_score
+        """
+
         """
         # 这个extract() 不知道是干嘛用的， 可能是从选择器对象中进行抽取。
         # 必须得从某个城市的页面中获取具体房间url送入队列，之后再爬取这个url的内容，因为在这个url页面中仍然存在大量的相同的url，所以必须进行去重的操作。
@@ -55,7 +48,8 @@ class AirbnbSpider(scrapy.Spider):
 
         # 查找本页面的租房信息
         for sel in response.xpath('//div[@itemprop="description"]/span/a'):
-            # print len(response.xpath('//div[@itemprop="description"]/span/a'))
+            # print
+            # len(response.xpath('//div[@itemprop="description"]/span/a'))
             url = 'https://zh.airbnb.com' + sel.xpath('@href').extract()[0]
             yield Request(url, callback=self.parse2)
 
@@ -68,6 +62,21 @@ class AirbnbSpider(scrapy.Spider):
                 yield Request(url, callback=self.parse)
 
     def parse2(self, response):
+        """
+        解析房间信息
+            抓取的信息包括room_name、（房间名称）
+                    room_id、（房间id）
+                    price、（价格）
+                    address、（地址）
+                    description、（描述）
+                    reviews_count、（评论）
+                    accuracy_score、（准确性评分）
+                    location_score、（位置评分）
+                    communication_score、（沟通交流评分）
+                    check_in_score、（入住评分）
+                    cleanliness_score、（清洁度评分）
+                    cost_performance_score（性价比评分）
+        """
         valid_urls = []
         items = []
         # 将房屋主人的信息单独拿出来，送入parse3()函数中
@@ -76,7 +85,7 @@ class AirbnbSpider(scrapy.Spider):
         if host:
             url = 'https://zh.airbnb.com/s?host_id=' + \
                 str(host[0].split('/')[-1])
-            print url
+            # print url
             if url not in valid_urls:
                 valid_urls.append(url)
                 yield Request(url, callback=self.parse3)
@@ -295,14 +304,16 @@ class AirbnbSpider(scrapy.Spider):
         else:
             pass
 
-    # 爬取房间主人拥有房间的信息
     def parse3(self, response):
-        # 示例网址
-        # https://zh.airbnb.com/users/show/3434101
-        # https://zh.airbnb.com/s?host_id=3434101
+        """
+        爬取房间主人拥有房间的信息
+        示例网址
+        https://zh.airbnb.com/users/show/3434101
+        https://zh.airbnb.com/s?host_id=3434101
 
-        # /rooms/905492?s=zp3AYLlk  这个加在host网页后面，即是host拥有的具体room信息
+        /rooms/905492?s=zp3AYLlk  这个加在host网页后面，即是host拥有的具体room信息
 
+        """
         item = info()
         item['host_id'] = response.url.split('=')[-1]
         item['room_name'] = []
@@ -317,11 +328,15 @@ class AirbnbSpider(scrapy.Spider):
 
         yield item
 
-    # 爬取房间的评论信息
     def parse4(self, response):
-        # 示例网址
-        # https://zh.airbnb.com/api/v2/reviews?key=d306zoyjsyarp7ifhu67rjxn52tv0t20&currency=CNY&locale=zh&listing_id=828294&role=guest&_format=for_p3&_limit=7&_offset=7&_order=language
+        """
+        爬取房间的评论信息
 
+        示例网址
+        https://zh.airbnb.com/api/v2/reviews?key=d306zoyjsyarp7ifhu67rjxn52tv0t20&currency=CNY&locale=zh&listing_id=828294&role=guest&_format=for_p3&_limit=7&_offset=7&_order=language
+
+        利用ajax的异步通信机制，进行评论信息的爬取
+        """
         item = reviews()
         a = json.loads(response.body)
         # item['room_id'] = re.findall(r'listing_id=(.*)?&role', response.url)[0]

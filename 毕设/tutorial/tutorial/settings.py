@@ -24,7 +24,7 @@ NEWSPIDER_MODULE = 'tutorial.spiders'
 # Configure a delay for requests for the same website (default: 0)
 # See http://scrapy.readthedocs.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-# DOWNLOAD_DELAY = 4
+DOWNLOAD_DELAY = 4
 # The download delay setting will honor only one of:
 # CONCURRENT_REQUESTS_PER_DOMAIN=16
 # CONCURRENT_REQUESTS_PER_IP=16
@@ -55,13 +55,10 @@ COOKIES_ENABLED=False
 # 	'tutorial.mymiddlewares.ProxyMiddleware': 544,
 # }
 DOWNLOADER_MIDDLEWARES = {
-    #    'cnblogs.middlewares.MyCustomDownloaderMiddleware': 543,
-    # 'tutorial.mymiddlewares.RandomUserAgent': 1, #随机user agent
     # 'scrapy.contrib.downloadermiddleware.httpproxy.HttpProxyMiddleware': 110, #此API已经弃用
-    # 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware':1,
-    #'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 110, #代理需要用到
-    # 'tutorial.mymiddlewares.ProxyMiddleware': 100, #代理需要用到
-    # 'scrapy_crawlera.CrawleraMiddleware': 600 , #crawlera代理用到
+    # 'scrapy.downloadermiddlewares.useragent':None,
+    # 'scrapy.downloadermiddlewares.httpproxy':None,
+    # 'tutorial.mymiddlewares.ProxyMiddleware': 750, #代理需要用到
     # 'tutorial.mymiddlewares.RotateUserAgentMiddleware':400,
 }
 
@@ -77,6 +74,8 @@ DOWNLOADER_MIDDLEWARES = {
 
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
+
+# 将抓取的item进行操作
 ITEM_PIPELINES = {
    # 'tutorial.pipelines.MySQLStoreCnblogsPipeline': 300,
    # 'tutorial.pipelines.TutorialPipeline':300,
@@ -109,10 +108,37 @@ ITEM_PIPELINES = {
 # CRAWLERA_PASS = '你crawlera账号的密码'
 
 # start MySQL database configure setting
-MYSQL_HOST = 'localhost'
-MYSQL_PORT = 3306
-MYSQL_DBNAME = 'test'
-MYSQL_USER = 'root'
-MYSQL_PASSWD = ''
+PROXIES=[
+{'ip_port':'110.73.51.124:8123','user_pass':''},
+{'ip_port':'110.72.47.111:8123','user_pass':''},
+{'ip_port':'219.143.142.9:80','user_pass':''},
+{'ip_port':'171.15.83.125:8888','user_pass':''},
+{'ip_port':'106.89.163.46:80','user_pass':''},
+{'ip_port':'182.90.23.233:80','user_pass':''},
+{'ip_port':'182.90.15.9:80','user_pass':''},
+{'ip_port':'182.88.231.59:8123','user_pass':''},
+{'ip_port':'121.199.7.65:8081','user_pass':''},
+{'ip_port':'121.31.198.183:8123','user_pass':''},
+{'ip_port':'182.88.129.166:8123','user_pass':''},
+{'ip_port':'171.212.67.187:8123','user_pass':''},
+{'ip_port':'182.90.19.65:80','user_pass':''},
+{'ip_port':'182.90.38.51:80','user_pass':''},
+{'ip_port':'182.90.3.84:80','user_pass':''},
+{'ip_port':'171.39.233.192:80','user_pass':''},
+{'ip_port':'114.55.29.219:80','user_pass':''},
+{'ip_port':'121.12.158.42:22','user_pass':''},
+{'ip_port':'182.90.36.219:80','user_pass':''},
+{'ip_port':'110.73.2.118:8123','user_pass':''},
+{'ip_port':'171.36.254.94:8123','user_pass':''},
+{'ip_port':'182.36.147.23:808','user_pass':''},
+{'ip_port':'121.31.148.124:8123','user_pass':''},
+{'ip_port':'182.90.4.247:80','user_pass':''},
+{'ip_port':'110.72.45.255:8123','user_pass':''},
+{'ip_port':'182.90.81.25:80','user_pass':''},
+{'ip_port':'182.90.39.198:80','user_pass':''},
+{'ip_port':'119.188.94.145:80','user_pass':''},
+]
+
+
 
 # end of MySQL database configure setting
