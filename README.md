@@ -7,7 +7,7 @@ mysql数据库实现异步存储
 ##使用
 以后再说。
 
-* 如果需要在网上平台进行测试，需要在 *scrapy.cfg* 目录下，使用 *shub deploy* 命令
+* 如果需要在网上平台进行测试，需要在 *scrapy.cfg* 同一目录，使用 *shub deploy* 命令
 
 
 This is [scrapy中文教程](http://scrapy-chs.readthedocs.org/zh_CN/latest/intro/tutorial.html).
