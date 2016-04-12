@@ -25,19 +25,21 @@ class AirbnbSpider(scrapy.Spider):
     allowed_domains = ['airbnb.com']
 
     # 测试用url
-    # start_urls = [  # 'https://zh.airbnb.com/rooms/905492?s=LJkKsDuT',
-    #     #'https://zh.airbnb.com/rooms/7327646?s=fy811GFZ',
-    #     # 'https://zh.airbnb.com/rooms/5012640?s=bUQrtusy'
-    # ]
-    start_urls = [
-        'https://zh.airbnb.com/s/London--United-Kingdom?source=ds',
-        'https://zh.airbnb.com/s/Los-Angeles--CA?source=ds',
-        'https://zh.airbnb.com/s/Tokyo--Japan?source=ds',
-        'https://zh.airbnb.com/s/Boston--MA']
+    start_urls = ['https://zh.airbnb.com/s/London--United-Kingdom?source=ds&s_tag=oHgwByya'
+                  # 'https://zh.airbnb.com/rooms/905492?s=LJkKsDuT',
+                  #'https://zh.airbnb.com/rooms/7327646?s=fy811GFZ',
+                  # 'https://zh.airbnb.com/rooms/5012640?s=bUQrtusy'
+                  ]
+    # start_urls = [
+    #     'https://zh.airbnb.com/s/London--United-Kingdom?source=ds&s_tag=oHgwByya',
+    #     'https://zh.airbnb.com/s/Los-Angeles--CA?source=ds',
+    #     'https://zh.airbnb.com/s/Tokyo--Japan?source=ds',
+    #     'https://zh.airbnb.com/s/Boston--MA']
 
     def parse(self, response):
         """抓取的信息包括room_name、
-                        room_id
+                        host_id、
+                        room_id、
                         price、
                         address、
                         description、
@@ -55,13 +57,15 @@ class AirbnbSpider(scrapy.Spider):
 
         # 查找本页面的租房信息
         for sel in response.xpath('//div[@itemprop="description"]/span/a'):
-            # print len(response.xpath('//div[@itemprop="description"]/span/a'))
+            # print
+            # len(response.xpath('//div[@itemprop="description"]/span/a'))
             url = 'https://zh.airbnb.com' + sel.xpath('@href').extract()[0]
             yield Request(url, callback=self.parse2)
 
         # 查找下一页的租房信息,因为每个页面都记录着别的页面的信息，并不是单纯的下一页，所以必须进行url的去重
-        count = response.xpath(
-            '/html/body/main/div[1]/div[1]/div[6]/div[4]/div[1]/div[2]/ul/li/a')
+        # count = response.xpath(
+        #     '/html/body/main/div[1]/div[1]/div[6]/div[4]/div[1]/div[2]/ul/li/a')
+        count = response.xpath('//ul[@class="list-unstyled"]/li/a')
         for sel in count:
             if len(count):
                 url = 'https://zh.airbnb.com' + sel.xpath('@href').extract()[0]
@@ -91,7 +95,7 @@ class AirbnbSpider(scrapy.Spider):
         item = AirbnbItem()
         # price与description可能会爬不下来，因为部分网页的结构不一样
         item['price'] = ''.join(response.xpath(
-            '//div[@class="book-it__price-amount js-book-it-price-amount pull-left h3 text-special"]/text()').extract()).strip()
+            '//span[@class="js-book-it-price-amount h3"]/text()').extract()).strip()
         if not item['price']:
             item['price'] = ''.join(response.xpath(
                 '//div[@class="book-it__price-amount pull-left h3 text-special"]/span/text()').extract()).strip()
@@ -142,7 +146,7 @@ class AirbnbSpider(scrapy.Spider):
 
         # 防止所取出的元素为空
         temp = response.xpath(
-            '/html/body/main/div[3]/div[2]/div/div/div[1]/div[1]/div/div/div[1]/div[2]/div[1]/a[2]/div/span/small/span[2]/text()').extract()
+            '//h4[@class="text-center-sm col-middle"]/span/text()').extract()
         if temp:
             item['reviews_count'] = temp[0].strip()
         else:
@@ -150,7 +154,8 @@ class AirbnbSpider(scrapy.Spider):
 
         count = 0
         if len(item['reviews_count']):
-            count = int(item['reviews_count'])
+            count = int(item['reviews_count'].split('条')[0])
+
         room_id = item['room_id']
 
         # 获取评论的url
@@ -188,7 +193,7 @@ class AirbnbSpider(scrapy.Spider):
         # 星星这个实在是厉害，空白星星也是一个元素，但是却不在我所计算的list长度里，它有两批星星，其中带颜色的是覆盖在灰色星星之上的
         count = []
         count = response.xpath(
-            '//*[@id="reviews"]/div/div/div/div/div/div[2]/div[1]/div[1]/div[2]/div/div[1]/div[1]/div/div/div/div[1]/span/i')
+            '//*[@id="reviews"]/div/div/div/div/div/div[2]/div[1]/div[1]/div[2]/div/div[1]/div[1]/div/div/div/div[1]/span/span/i')
         if len(count):
             count[-
                   1].xpath('@class').extract() == 'icon-star-half icon icon-beach icon-star-big'
@@ -198,7 +203,7 @@ class AirbnbSpider(scrapy.Spider):
 
         count = []
         count = response.xpath(
-            '//*[@id="reviews"]/div/div/div/div/div/div[2]/div[1]/div[1]/div[2]/div/div[2]/div[1]/div/div/div/div[1]/span/i')
+            '//*[@id="reviews"]/div/div/div/div/div/div[2]/div[1]/div[1]/div[2]/div/div[2]/div[1]/div/div/div/div[1]/span/span/i')
         if len(count):
             count[-
                   1].xpath('@class').extract() == 'icon-star-half icon icon-beach icon-star-big'
@@ -208,7 +213,7 @@ class AirbnbSpider(scrapy.Spider):
 
         count = []
         count = response.xpath(
-            '//*[@id="reviews"]/div/div/div/div/div/div[2]/div[1]/div[1]/div[2]/div/div[1]/div[2]/div/div/div/div[1]/span/i')
+            '//*[@id="reviews"]/div/div/div/div/div/div[2]/div[1]/div[1]/div[2]/div/div[1]/div[2]/div/div/div/div[1]/span/span/i')
         if len(count):
             count[-
                   1].xpath('@class').extract() == 'icon-star-half icon icon-beach icon-star-big'
@@ -218,7 +223,7 @@ class AirbnbSpider(scrapy.Spider):
 
         count = []
         count = response.xpath(
-            '//*[@id="reviews"]/div/div/div/div/div/div[2]/div[1]/div[1]/div[2]/div/div[2]/div[2]/div/div/div/div[1]/span/i')
+            '//*[@id="reviews"]/div/div/div/div/div/div[2]/div[1]/div[1]/div[2]/div/div[2]/div[2]/div/div/div/div[1]/span/span/i')
         if len(count):
             count[-
                   1].xpath('@class').extract() == 'icon-star-half icon icon-beach icon-star-big'
@@ -228,7 +233,7 @@ class AirbnbSpider(scrapy.Spider):
 
         count = []
         count = response.xpath(
-            '//*[@id="reviews"]/div/div/div/div/div/div[2]/div[1]/div[1]/div[2]/div/div[1]/div[3]/div/div/div/div[1]/span/i')
+            '//*[@id="reviews"]/div/div/div/div/div/div[2]/div[1]/div[1]/div[2]/div/div[1]/div[3]/div/div/div/div[1]/span/span/i')
         if len(count):
             count[-
                   1].xpath('@class').extract() == 'icon-star-half icon icon-beach icon-star-big'
@@ -238,7 +243,7 @@ class AirbnbSpider(scrapy.Spider):
 
         count = []
         count = response.xpath(
-            '//*[@id="reviews"]/div/div/div/div/div/div[2]/div[1]/div[1]/div[2]/div/div[2]/div[3]/div/div/div/div[1]/span/i')
+            '//*[@id="reviews"]/div/div/div/div/div/div[2]/div[1]/div[1]/div[2]/div/div[2]/div[3]/div/div/div/div[1]/span/span/i')
         if len(count):
             count[-
                   1].xpath('@class').extract() == 'icon-star-half icon icon-beach icon-star-big'

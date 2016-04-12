@@ -31,7 +31,11 @@ conn= MySQLdb.connect(
 cur = conn.cursor()
 #创建数据表
 # cur.execute("CREATE DATABASE test1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci")
+cur.execute("DROP TABLE IF EXISTS room_info")
+cur.execute("DROP TABLE IF EXISTS host_room")
+cur.execute("DROP TABLE IF EXISTS room_review")
 cur.execute("create table room_info(room_id varchar(20) ,\
+                                    host_id varchar(20),\
 									price varchar(20),\
 									room_name varchar(30),\
 									address varchar(10),\

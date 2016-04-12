@@ -35,31 +35,31 @@ class TutorialPipeline(object):
         # 这里存在一个序列化保存的问题，因为mysql支持的保存类型并没有，所以需要进行序列化来保存数据结构的类型
         # 判断item的长度  存入不同的表中
         if len(item) == 2:
-            self.cur.execute("insert into room_review (room_id,review) values(%s,%s)", (item[
-                'room_id'], json.dumps(item['review'])))
+            self.cur.execute("insert into room_review (room_id,review) values(%s,%s)", (json.dumps(item[
+                'room_id']), json.dumps(item['review'])))
             print item
         elif len(item) == 3:
 
             self.cur.execute("insert into host_room (host_id,room_id,room_name) values(%s,%s,%s)",
-                             (item['host_id'],
+                             (json.dumps(item['host_id']),
                               json.dumps(item['room_id']),
                               json.dumps(item['room_name'])))
             print item
         else:
             self.cur.execute("insert into room_info (room_id,host_id,price,room_name,address,description,reviews_count,accuracy_score ,location_score ,communication_score,check_in_score,cleanliness_score ,cost_performance_score) values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
-                             (item['room_id'],
-                              item['host_id'],
-                              item['price'],
-                              item['room_name'],
-                              item['address'],
+                             (json.dumps(item['room_id']),
+                              json.dumps(item['host_id']),
+                              json.dumps(item['price']),
+                              json.dumps(item['room_name']),
+                              json.dumps(item['address']),
                               json.dumps(item['description']),
-                              item['reviews_count'],
-                              item['accuracy_score'],
-                              item['location_score'],
-                              item['communication_score'],
-                              item['check_in_score'],
-                              item['cleanliness_score'],
-                              item['cost_performance_score']))
+                              json.dumps(item['reviews_count']),
+                              json.dumps(item['accuracy_score']),
+                              json.dumps(item['location_score']),
+                              json.dumps(item['communication_score']),
+                              json.dumps(item['check_in_score']),
+                              json.dumps(item['cleanliness_score']),
+                              json.dumps(item['cost_performance_score'])))
             print item
         # self.cur.close()
         self.conn.commit()
